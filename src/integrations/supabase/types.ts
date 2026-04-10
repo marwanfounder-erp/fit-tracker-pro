@@ -14,7 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      workout_logs: {
+        Row: {
+          created_at: string
+          day_key: string
+          exercise_name: string
+          id: string
+          reps: number | null
+          rir: number | null
+          session_date: string
+          set_number: number
+          updated_at: string
+          weight: number | null
+        }
+        Insert: {
+          created_at?: string
+          day_key: string
+          exercise_name: string
+          id?: string
+          reps?: number | null
+          rir?: number | null
+          session_date?: string
+          set_number?: number
+          updated_at?: string
+          weight?: number | null
+        }
+        Update: {
+          created_at?: string
+          day_key?: string
+          exercise_name?: string
+          id?: string
+          reps?: number | null
+          rir?: number | null
+          session_date?: string
+          set_number?: number
+          updated_at?: string
+          weight?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
