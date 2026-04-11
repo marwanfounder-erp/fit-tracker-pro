@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Plus, X, Minus } from "lucide-react";
+import { Plus, X, Minus, Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { foodLibrary, calcNutrition, CATEGORIES, type CategoryKey, type FoodItem } from "@/data/foodLibrary";
 
@@ -23,6 +23,7 @@ export default function FoodLog() {
   const [selectedFood, setSelectedFood] = useState<FoodItem>(foodLibrary[0]);
   const [qty, setQty] = useState<number>(foodLibrary[0].defaultQty);
   const [saving, setSaving] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const queryClient = useQueryClient();
 
   const { data: foodLogs = [] } = useQuery<FoodLogEntry[]>({
@@ -43,9 +44,13 @@ export default function FoodLog() {
   const totalCalories = foodLogs.reduce((acc, f) => acc + f.total_calories, 0);
 
   const filteredFoods = useMemo(() => {
-    if (activeCategory === "all") return foodLibrary;
-    return foodLibrary.filter((f) => f.category === activeCategory);
-  }, [activeCategory]);
+    let foods = activeCategory === "all" ? foodLibrary : foodLibrary.filter((f) => f.category === activeCategory);
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      foods = foods.filter((f) => f.name.toLowerCase().includes(q));
+    }
+    return foods;
+  }, [activeCategory, searchQuery]);
 
   const nutrition = calcNutrition(selectedFood, qty);
   const step = selectedFood.unit === "g" ? 25 : 1;
@@ -89,6 +94,7 @@ export default function FoodLog() {
       setSelectedFood(foodLibrary[0]);
       setQty(foodLibrary[0].defaultQty);
       setActiveCategory("all");
+      setSearchQuery("");
     }
     setSaving(false);
   };
@@ -180,8 +186,32 @@ export default function FoodLog() {
             ))}
           </div>
 
+          {/* Search */}
+          <div className="px-3 pb-2 border-t border-border pt-2">
+            <div className="flex items-center gap-2 border border-border bg-background px-2 py-1.5">
+              <Search size={12} className="text-muted-foreground shrink-0" />
+              <input
+                type="text"
+                placeholder="Search food..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="flex-1 bg-transparent font-mono text-xs text-foreground placeholder:text-muted-foreground outline-none uppercase tracking-tight"
+              />
+              {searchQuery && (
+                <button onClick={() => setSearchQuery("")} className="text-muted-foreground hover:text-foreground transition-colors">
+                  <X size={11} />
+                </button>
+              )}
+            </div>
+          </div>
+
           {/* Food List */}
           <div className="max-h-52 overflow-y-auto border-t border-border">
+            {filteredFoods.length === 0 && (
+              <p className="px-3 py-4 font-mono text-[10px] uppercase tracking-widest text-muted-foreground text-center">
+                No results
+              </p>
+            )}
             {filteredFoods.map((food) => (
               <button
                 key={food.name}
@@ -258,7 +288,7 @@ export default function FoodLog() {
           {/* Action Buttons */}
           <div className="flex border-t-2 border-border">
             <button
-              onClick={() => setIsAdding(false)}
+              onClick={() => { setIsAdding(false); setSearchQuery(""); }}
               className="px-5 py-3.5 border-r-2 border-border font-mono text-xs uppercase text-muted-foreground hover:text-foreground transition-colors"
             >
               Cancel

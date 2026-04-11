@@ -113,12 +113,12 @@ export default function Index() {
                 </p>
               </div>
             )}
-            <button
+            {/* <button
               onClick={() => setSettingsOpen(true)}
               className="pb-0.5 text-muted-foreground hover:text-primary transition-colors"
             >
               <Settings size={20} />
-            </button>
+            </button> */}
           </div>
         </div>
 
