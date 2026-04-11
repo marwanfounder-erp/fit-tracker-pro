@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Plus, X, Minus, Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { foodLibrary, calcNutrition, CATEGORIES, type CategoryKey, type FoodItem } from "@/data/foodLibrary";
 
 interface FoodLogEntry {
@@ -17,6 +18,7 @@ interface FoodLogEntry {
 }
 
 export default function FoodLog() {
+  const { user } = useAuth();
   const today = new Date().toISOString().split("T")[0];
   const [isAdding, setIsAdding] = useState(false);
   const [activeCategory, setActiveCategory] = useState<CategoryKey>("all");
@@ -84,6 +86,7 @@ export default function FoodLog() {
       calories_per_100g: selectedFood.caloriesPer100g,
       total_protein: n.protein,
       total_calories: n.calories,
+      user_id: user?.id ?? null,
     });
     if (error) {
       toast.error("Failed to log food");

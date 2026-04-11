@@ -1,7 +1,9 @@
 import { useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { Settings } from "lucide-react";
+import { Settings, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { useWorkoutProgram } from "@/hooks/useWorkoutProgram";
 import DaySelector from "@/components/DaySelector";
 import ExerciseCard from "@/components/ExerciseCard";
@@ -21,6 +23,8 @@ function getTodayDayKey(): string {
 }
 
 export default function Index() {
+  const { user, profile, signOut } = useAuth();
+  const navigate = useNavigate();
   const { program, addExercise, removeExercise, resetToDefault } = useWorkoutProgram();
 
   const todayKey = getTodayDayKey();
@@ -71,6 +75,7 @@ export default function Index() {
           weight: s.weight ? parseFloat(s.weight) : null,
           reps: s.reps ? parseInt(s.reps) : null,
           rir: s.rir ? parseInt(s.rir) : null,
+          user_id: user?.id ?? null,
         }))
     );
 
@@ -113,12 +118,13 @@ export default function Index() {
                 </p>
               </div>
             )}
-            {/* <button
-              onClick={() => setSettingsOpen(true)}
+            <button
+              onClick={async () => { await signOut(); navigate("/login"); }}
               className="pb-0.5 text-muted-foreground hover:text-primary transition-colors"
+              title="Sign out"
             >
-              <Settings size={20} />
-            </button> */}
+              <LogOut size={18} />
+            </button>
           </div>
         </div>
 
