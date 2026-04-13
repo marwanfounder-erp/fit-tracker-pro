@@ -47,12 +47,31 @@ export default function AdminDashboard() {
   const { data: recentWorkouts = [] } = useQuery<RecentLog[]>({
     queryKey: ["admin-recent-workouts"],
     queryFn: async () => {
-      const { data } = await sb
+      const { data: logs, error: logsErr } = await sb
         .from("workout_logs")
-        .select("id, session_date, exercise_name, weight, reps, rir, user_id, profiles(full_name, email)")
+        .select("id, session_date, exercise_name, weight, reps, rir, user_id")
+        .order("session_date", { ascending: false })
         .order("created_at", { ascending: false })
         .limit(8);
-      return data ?? [];
+      console.log("[dashboard] logs:", logs, "error:", logsErr);
+      if (!logs?.length) return [];
+
+      const userIds = [...new Set(logs.map((l: { user_id: string }) => l.user_id))];
+      const { data: profiles, error: profilesErr } = await sb
+        .from("profiles")
+        .select("id, full_name, email")
+        .in("id", userIds);
+      console.log("[dashboard] profiles:", profiles, "error:", profilesErr);
+
+      const profileMap: Record<string, { full_name: string | null; email: string }> = {};
+      (profiles ?? []).forEach((p: { id: string; full_name: string | null; email: string }) => {
+        profileMap[p.id] = { full_name: p.full_name, email: p.email };
+      });
+
+      return logs.map((l: Omit<RecentLog, "profiles">) => ({
+        ...l,
+        profiles: profileMap[l.user_id] ?? null,
+      }));
     },
   });
 
