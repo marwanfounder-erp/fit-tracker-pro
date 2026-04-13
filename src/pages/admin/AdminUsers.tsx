@@ -129,10 +129,10 @@ export default function AdminUsers() {
             {users.map((u) => (
               <div
                 key={u.id}
-                className="flex md:grid md:grid-cols-[1fr_1fr_100px_140px_48px] items-center gap-3 md:gap-0 px-4 py-3 hover:bg-iron-medium/40 transition-colors"
+                className="flex md:grid md:grid-cols-[1fr_1fr_100px_140px_48px] items-center gap-3 md:gap-0 py-3 hover:bg-iron-medium/40 transition-colors"
               >
                 {/* Name + role */}
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0 px-4">
                   <p className="font-mono text-xs text-foreground uppercase truncate">
                     {u.full_name || "—"}
                   </p>
