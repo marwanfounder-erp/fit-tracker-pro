@@ -108,8 +108,8 @@ export default function AdminUsers() {
 
       {/* Users Table */}
       <div className="bg-card border-2 border-border overflow-hidden">
-        <div className="hidden md:grid grid-cols-[1fr_1fr_80px_80px_120px_48px] gap-0 border-b-2 border-border">
-          {["Name", "Email", "Workouts", "Food Logs", "Joined", ""].map((h) => (
+        <div className="hidden md:grid grid-cols-[1fr_1fr_100px_140px_48px] gap-0 border-b-2 border-border">
+          {["Name", "Email", "Workouts", "Joined", ""].map((h) => (
             <div key={h} className="px-4 py-2.5 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
               {h}
             </div>
@@ -129,7 +129,7 @@ export default function AdminUsers() {
             {users.map((u) => (
               <div
                 key={u.id}
-                className="flex md:grid md:grid-cols-[1fr_1fr_80px_80px_120px_48px] items-center gap-3 md:gap-0 px-4 py-3 hover:bg-iron-medium/40 transition-colors"
+                className="flex md:grid md:grid-cols-[1fr_1fr_100px_140px_48px] items-center gap-3 md:gap-0 px-4 py-3 hover:bg-iron-medium/40 transition-colors"
               >
                 {/* Name + role */}
                 <div className="flex-1 min-w-0">
@@ -151,11 +151,6 @@ export default function AdminUsers() {
                 {/* Workout count */}
                 <p className="hidden md:block font-mono text-sm text-foreground font-bold px-4">
                   {u.workout_count}
-                </p>
-
-                {/* Food count */}
-                <p className="hidden md:block font-mono text-sm text-foreground font-bold px-4">
-                  {u.food_count}
                 </p>
 
                 {/* Joined */}
