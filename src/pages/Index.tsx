@@ -132,7 +132,7 @@ export default function Index() {
         {tab === "log" ? (
           <>
             <DaySelector selectedDay={currentDay} onSelect={handleSelectDay} />
-            <div className="grid grid-cols-2 mt-3 border-t border-border">
+            <div className="grid grid-cols-1 mt-3 border-t border-border">
               <button
                 onClick={() => setLogTab("workout")}
                 className={`py-2.5 font-mono text-xs uppercase tracking-widest transition-colors border-b-2 ${
@@ -143,6 +143,7 @@ export default function Index() {
               >
                 Workout
               </button>
+              {/* FUEL TAB — temporarily disabled
               <button
                 onClick={() => setLogTab("food")}
                 className={`py-2.5 font-mono text-xs uppercase tracking-widest transition-colors border-b-2 ${
@@ -153,6 +154,7 @@ export default function Index() {
               >
                 Fuel
               </button>
+              */}
             </div>
           </>
         ) : (
@@ -234,11 +236,14 @@ export default function Index() {
                 </div>
               )}
             </div>
+          ) : null
+          /* FUEL CONTENT — temporarily disabled
           ) : (
             <div className="px-4 pt-2">
               <FoodLog />
             </div>
           )
+          */
         ) : (
           <OverviewPage dateFilter={dateFilter} />
         )}
