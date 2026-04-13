@@ -6,7 +6,7 @@ import { useWorkoutProgram } from "@/hooks/useWorkoutProgram";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import {
-  ArrowLeft, Dumbbell, Utensils, Zap, Flame,
+  ArrowLeft, Dumbbell,
   ChevronDown, ChevronUp, Plus, X, RotateCcw, TrendingUp,
 } from "lucide-react";
 import type { Exercise } from "@/data/workoutProgram";
@@ -222,6 +222,7 @@ export default function AdminUserDetail() {
     enabled: !!id,
   });
 
+  /* FOOD LOGS — temporarily hidden
   const { data: foodLogs = [] } = useQuery<FoodLog[]>({
     queryKey: ["admin-user-food", id],
     queryFn: async () => {
@@ -233,9 +234,10 @@ export default function AdminUserDetail() {
     },
     enabled: !!id,
   });
-
-  const totalProtein = foodLogs.reduce((a, f) => a + f.total_protein, 0);
-  const totalCalories = foodLogs.reduce((a, f) => a + f.total_calories, 0);
+  */
+  const foodLogs: FoodLog[] = []; // temporarily hidden
+  const totalProtein = 0;         // temporarily hidden
+  const totalCalories = 0;        // temporarily hidden
   const progress = buildProgress(workoutLogs);
 
   // Group history by date
@@ -243,11 +245,9 @@ export default function AdminUserDetail() {
     if (!acc[l.session_date]) acc[l.session_date] = [];
     acc[l.session_date].push(l); return acc;
   }, {});
-  const foodByDate = foodLogs.reduce<Record<string, FoodLog[]>>((acc, f) => {
-    if (!acc[f.session_date]) acc[f.session_date] = [];
-    acc[f.session_date].push(f); return acc;
-  }, {});
-  const allDates = Array.from(new Set([...Object.keys(workoutsByDate), ...Object.keys(foodByDate)])).sort((a, b) => b.localeCompare(a));
+  // const foodByDate = ... // temporarily hidden
+  const foodByDate: Record<string, FoodLog[]> = {};
+  const allDates = Array.from(new Set([...Object.keys(workoutsByDate)])).sort((a, b) => b.localeCompare(a));
 
   if (profileLoading) return <div className="p-6 font-mono text-[10px] uppercase tracking-widest text-muted-foreground animate-pulse">Loading...</div>;
   if (!profile) return <div className="p-6 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">User not found</div>;
@@ -291,9 +291,10 @@ export default function AdminUserDetail() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
           { label: "Workout Sets", value: workoutLogs.length, icon: Dumbbell },
-          { label: "Food Logs", value: foodLogs.length, icon: Utensils },
-          { label: "Total Protein", value: `${totalProtein.toFixed(0)}g`, icon: Zap },
-          { label: "Total Calories", value: Math.round(totalCalories), icon: Flame },
+          // Food stats temporarily hidden
+          // { label: "Food Logs", value: foodLogs.length, icon: Utensils },
+          // { label: "Total Protein", value: `${totalProtein.toFixed(0)}g`, icon: Zap },
+          // { label: "Total Calories", value: Math.round(totalCalories), icon: Flame },
         ].map(({ label, value, icon: Icon }) => (
           <div key={label} className="bg-card border-2 border-border p-3 space-y-2">
             <div className="flex items-center justify-between">
@@ -413,28 +414,13 @@ export default function AdminUserDetail() {
                       ))}
                     </div>
                   )}
+                  {/* FUEL SECTION — temporarily hidden
                   {dayFoods.length > 0 && (
                     <div className="space-y-2 border-t border-border pt-3">
-                      <div className="flex items-center justify-between">
-                        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground border-l-2 border-primary pl-2">Fuel</p>
-                        <div className="flex gap-3 font-mono text-[10px]">
-                          <span><span className="text-primary font-bold">{dayProtein.toFixed(1)}g</span><span className="text-muted-foreground"> prot</span></span>
-                          <span><span className="text-foreground font-bold">{Math.round(dayCalories)}</span><span className="text-muted-foreground"> kcal</span></span>
-                        </div>
-                      </div>
-                      {dayFoods.map((item) => (
-                        <div key={item.id} className="flex items-center gap-2.5 px-3 py-2 bg-iron-medium border border-border">
-                          <span className="text-sm">{item.emoji}</span>
-                          <p className="flex-1 font-mono text-xs uppercase tracking-tight text-foreground truncate">{item.food_name}</p>
-                          <div className="flex gap-2 font-mono text-[10px] shrink-0">
-                            <span className="text-muted-foreground">{item.quantity}{unitLabel(item.unit)}</span>
-                            <span className="text-primary">{item.total_protein.toFixed(1)}g</span>
-                            <span className="text-muted-foreground">{Math.round(item.total_calories)}kcal</span>
-                          </div>
-                        </div>
-                      ))}
+                      ...
                     </div>
                   )}
+                  */}
                 </div>
               );
             })

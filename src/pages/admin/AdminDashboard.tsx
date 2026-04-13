@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Users, Dumbbell, Utensils, Activity } from "lucide-react";
+import { Users, Dumbbell, Activity } from "lucide-react";
 import { format } from "date-fns";
 
 interface RecentLog {
@@ -34,6 +34,7 @@ export default function AdminDashboard() {
     },
   });
 
+  /* FOOD STATS — temporarily hidden
   const { data: foodCount = 0 } = useQuery({
     queryKey: ["admin-food-count"],
     queryFn: async () => {
@@ -41,6 +42,7 @@ export default function AdminDashboard() {
       return count ?? 0;
     },
   });
+  */
 
   const { data: recentWorkouts = [] } = useQuery<RecentLog[]>({
     queryKey: ["admin-recent-workouts"],
@@ -57,7 +59,7 @@ export default function AdminDashboard() {
   const stats = [
     { label: "Total Users", value: userCount, icon: Users, color: "text-primary" },
     { label: "Workout Sets", value: workoutCount, icon: Dumbbell, color: "text-foreground" },
-    { label: "Food Logs", value: foodCount, icon: Utensils, color: "text-foreground" },
+    // { label: "Food Logs", value: foodCount, icon: Utensils, color: "text-foreground" }, // temporarily hidden
   ];
 
   return (
