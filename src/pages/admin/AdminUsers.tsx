@@ -1,18 +1,10 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { createClient } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Plus, Eye, X, Loader2 } from "lucide-react";
 import { format } from "date-fns";
-
-// Admin client uses service role key — bypasses RLS, server-side only operations
-const supabaseAdmin = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_SERVICE_KEY,
-  { auth: { autoRefreshToken: false, persistSession: false } }
-);
 
 interface Profile {
   id: string;
@@ -73,24 +65,19 @@ export default function AdminUsers() {
     e.preventDefault();
     setCreating(true);
     try {
-      const { data, error } = await supabaseAdmin.auth.admin.createUser({
-        email: form.email,
-        password: form.password,
-        email_confirm: true,
-        user_metadata: { full_name: form.full_name },
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch("/api/create-user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session?.access_token}`,
+        },
+        body: JSON.stringify({ email: form.email, password: form.password, full_name: form.full_name }),
       });
-      if (error) {
-        toast.error(error.message);
+      const result = await res.json();
+      if (!res.ok || result.error) {
+        toast.error(result.error ?? "Failed to create user");
       } else {
-        // Ensure profile has full_name (trigger auto-creates it, but let's upsert to be safe)
-        if (data.user) {
-          await (supabaseAdmin as any).from("profiles").upsert({
-            id: data.user.id,
-            email: data.user.email,
-            full_name: form.full_name,
-            role: "user",
-          });
-        }
         toast.success(`User ${form.email} created!`);
         setShowCreate(false);
         setForm({ email: "", password: "", full_name: "" });
