@@ -16,7 +16,6 @@ export default async function handler(req: any, res: any) {
   const anonKey = process.env.VITE_SUPABASE_PUBLISHABLE_KEY!;
   // Service key — set in Vercel env WITHOUT "VITE_" prefix so it stays server-side only
   const serviceKey = process.env.SUPABASE_SERVICE_KEY!;
-
   if (!serviceKey) return res.status(500).json({ error: "Server misconfigured: missing SUPABASE_SERVICE_KEY" });
 
   // Verify the calling user's JWT
