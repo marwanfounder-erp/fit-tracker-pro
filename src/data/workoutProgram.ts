@@ -55,6 +55,7 @@ export const workoutProgram: WorkoutDay[] = [
     title: "LOWER 2",
     type: "workout",
     exercises: [
+      { name: "Deadlift", sets: 3, targetReps: "8-10", coachingNotes: "", youtubeSearch: "deadlift+proper+form" },
       { name: "Leg Extension", sets: 3, targetReps: "12", coachingNotes: "", youtubeSearch: "leg+extension+machine+proper+form" },
       { name: "Reverse Curl", sets: 3, targetReps: "15", coachingNotes: "", youtubeSearch: "lying+leg+curl+proper+form" },
       { name: "Seated Calf Raises", sets: 3, targetReps: "15", coachingNotes: "Slow and controlled.", youtubeSearch: "seated+calf+raises+proper+form" },
