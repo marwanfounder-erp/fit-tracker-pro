@@ -9,6 +9,7 @@ import DaySelector from "@/components/DaySelector";
 import ExerciseCard from "@/components/ExerciseCard";
 import BottomNav from "@/components/BottomNav";
 import OverviewPage from "@/components/OverviewPage";
+import WorkoutProgress from "@/components/WorkoutProgress";
 import FoodLog from "@/components/FoodLog";
 import WorkoutSettings from "@/components/WorkoutSettings";
 import { Footprints, StretchHorizontal } from "lucide-react";
@@ -34,6 +35,7 @@ export default function Index() {
   const [tab, setTab] = useState<"log" | "overview">("log");
   const [logTab, setLogTab] = useState<"workout" | "food">("workout");
   const [dateFilter, setDateFilter] = useState<DateFilter>("all");
+  const [overviewTab, setOverviewTab] = useState<"history" | "progress">("history");
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [exerciseLogs, setExerciseLogs] = useState<Record<string, SetLog[]>>({});
   const [saving, setSaving] = useState(false);
@@ -158,21 +160,40 @@ export default function Index() {
             </div>
           </>
         ) : (
-          /* Overview tab: date filter pills */
-          <div className="flex gap-1.5 pt-1">
-            {(["all", "week", "month"] as DateFilter[]).map((f) => (
-              <button
-                key={f}
-                onClick={() => setDateFilter(f)}
-                className={`px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest border transition-colors ${
-                  dateFilter === f
-                    ? "bg-primary text-primary-foreground border-primary"
-                    : "border-border text-muted-foreground hover:border-foreground hover:text-foreground"
-                }`}
-              >
-                {f === "all" ? "All Time" : f === "week" ? "This Week" : "This Month"}
-              </button>
-            ))}
+          /* Overview tab: sub-tabs + date filter */
+          <div className="space-y-2 pt-1">
+            <div className="flex gap-1.5">
+              {(["history", "progress"] as const).map((t) => (
+                <button
+                  key={t}
+                  onClick={() => setOverviewTab(t)}
+                  className={`px-4 py-1.5 font-mono text-[10px] uppercase tracking-widest border transition-colors ${
+                    overviewTab === t
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "border-border text-muted-foreground hover:border-foreground hover:text-foreground"
+                  }`}
+                >
+                  {t === "history" ? "History" : "Progress"}
+                </button>
+              ))}
+            </div>
+            {overviewTab === "history" && (
+              <div className="flex gap-1.5">
+                {(["all", "week", "month"] as DateFilter[]).map((f) => (
+                  <button
+                    key={f}
+                    onClick={() => setDateFilter(f)}
+                    className={`px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest border transition-colors ${
+                      dateFilter === f
+                        ? "bg-foreground text-background border-foreground"
+                        : "border-border text-muted-foreground hover:border-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {f === "all" ? "All Time" : f === "week" ? "This Week" : "This Month"}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </header>
@@ -244,8 +265,10 @@ export default function Index() {
             </div>
           )
           */
-        ) : (
+        ) : overviewTab === "history" ? (
           <OverviewPage dateFilter={dateFilter} />
+        ) : (
+          <WorkoutProgress />
         )}
       </main>
 
