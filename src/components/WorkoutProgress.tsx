@@ -56,16 +56,23 @@ const CustomTooltip = ({
   );
 };
 
-export default function WorkoutProgress() {
+interface Props {
+  userId?: string;
+}
+
+export default function WorkoutProgress({ userId }: Props = {}) {
   const [selectedExercise, setSelectedExercise] = useState<string | null>(null);
 
   const { data: logs, isLoading } = useQuery({
-    queryKey: ["workout-logs-progress"],
+    queryKey: ["workout-logs-progress", userId ?? "self"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let query = (supabase as any)
         .from("workout_logs")
         .select("id, session_date, exercise_name, set_number, weight, reps")
         .order("session_date", { ascending: true });
+      if (userId) query = query.eq("user_id", userId);
+      const { data, error } = await query;
       if (error) throw error;
       return data as LogEntry[];
     },

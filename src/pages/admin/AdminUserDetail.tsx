@@ -7,9 +7,10 @@ import { format } from "date-fns";
 import { toast } from "sonner";
 import {
   ArrowLeft, Dumbbell,
-  ChevronDown, ChevronUp, Plus, X, RotateCcw, TrendingUp,
+  ChevronDown, ChevronUp, Plus, X, RotateCcw,
 } from "lucide-react";
 import type { Exercise } from "@/data/workoutProgram";
+import WorkoutProgress from "@/components/WorkoutProgress";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const sb = supabase as any;
@@ -30,40 +31,6 @@ interface FoodLog {
 
 const unitLabel = (u: string) =>
   ({ g: "g", piece: "pcs", scoop: "scoops", slice: "slices" }[u] ?? u);
-
-// ─── Progress helpers ─────────────────────────────────────────────────────────
-interface ExerciseStat {
-  name: string;
-  sessions: number;
-  pr: { weight: number; reps: number | null };
-  lastWeights: number[];   // chronological, last 5
-}
-
-function buildProgress(logs: WorkoutLog[]): ExerciseStat[] {
-  const map: Record<string, { dates: Set<string>; weights: { date: string; w: number; r: number | null }[] }> = {};
-
-  logs.forEach((l) => {
-    if (l.weight == null) return;
-    if (!map[l.exercise_name]) map[l.exercise_name] = { dates: new Set(), weights: [] };
-    map[l.exercise_name].dates.add(l.session_date);
-    map[l.exercise_name].weights.push({ date: l.session_date, w: l.weight, r: l.reps });
-  });
-
-  return Object.entries(map)
-    .map(([name, { dates, weights }]) => {
-      const sorted = [...weights].sort((a, b) => a.date.localeCompare(b.date));
-      const pr = sorted.reduce(
-        (best, cur) => (cur.w > best.weight ? { weight: cur.w, reps: cur.r } : best),
-        { weight: 0, reps: null as number | null }
-      );
-      // Last 5 unique session dates
-      const byDate: Record<string, number> = {};
-      sorted.forEach(({ date, w }) => { byDate[date] = Math.max(byDate[date] ?? 0, w); });
-      const lastWeights = Object.values(byDate).slice(-5);
-      return { name, sessions: dates.size, pr, lastWeights };
-    })
-    .sort((a, b) => b.sessions - a.sessions);
-}
 
 // ─── Program Editor (inline) ──────────────────────────────────────────────────
 function ProgramEditor({ userId }: { userId: string }) {
@@ -236,9 +203,6 @@ export default function AdminUserDetail() {
   });
   */
   const foodLogs: FoodLog[] = []; // temporarily hidden
-  const totalProtein = 0;         // temporarily hidden
-  const totalCalories = 0;        // temporarily hidden
-  const progress = buildProgress(workoutLogs);
 
   // Group history by date
   const workoutsByDate = workoutLogs.reduce<Record<string, WorkoutLog[]>>((acc, l) => {
@@ -317,54 +281,7 @@ export default function AdminUserDetail() {
       </div>
 
       {/* ── PROGRESS TAB ── */}
-      {activeTab === "progress" && (
-        <div className="space-y-3">
-          {progress.length === 0 ? (
-            <p className="py-8 text-center font-mono text-[10px] uppercase tracking-widest text-muted-foreground">No workout data yet</p>
-          ) : (
-            progress.map((stat) => {
-              const max = Math.max(...stat.lastWeights, 1);
-              return (
-                <div key={stat.name} className="bg-card border-2 border-border p-4 space-y-3">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <p className="font-mono text-xs uppercase tracking-tight text-foreground font-bold">{stat.name}</p>
-                      <p className="font-mono text-[10px] text-muted-foreground">{stat.sessions} session{stat.sessions !== 1 ? "s" : ""}</p>
-                    </div>
-                    <div className="text-right shrink-0">
-                      <div className="flex items-center gap-1 justify-end">
-                        <TrendingUp size={11} className="text-primary" />
-                        <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">PR</span>
-                      </div>
-                      <p className="font-mono text-sm font-bold text-foreground">
-                        {stat.pr.weight}kg{stat.pr.reps != null ? ` × ${stat.pr.reps}` : ""}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Weight trend bars */}
-                  {stat.lastWeights.length > 1 && (
-                    <div className="space-y-1">
-                      <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">Last {stat.lastWeights.length} sessions</p>
-                      <div className="flex items-end gap-1 h-10">
-                        {stat.lastWeights.map((w, i) => (
-                          <div key={i} className="flex-1 flex flex-col items-center justify-end gap-0.5">
-                            <span className="font-mono text-[8px] text-muted-foreground">{w}</span>
-                            <div
-                              className={`w-full ${i === stat.lastWeights.length - 1 ? "bg-primary" : "bg-iron-medium border border-border"}`}
-                              style={{ height: `${Math.round((w / max) * 28) + 4}px` }}
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })
-          )}
-        </div>
-      )}
+      {activeTab === "progress" && id && <WorkoutProgress userId={id} />}
 
       {/* ── PROGRAM TAB ── */}
       {activeTab === "program" && id && <ProgramEditor userId={id} />}
